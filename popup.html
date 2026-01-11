@@ -5,9 +5,43 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h3>Smart Extractor</h3>
-  <button id="start">Extract & Send</button>
-  <p id="status"></p>
+  <div class="container">
+    <header>
+      <h3>Smart Extractor</h3>
+      <button id="start">Extract & Send</button>
+    </header>
+    
+    <p id="status" class="status-message"></p>
+    
+    <div id="results" class="results-container" style="display: none;">
+      <!-- Client Details Section -->
+      <div class="section client-section">
+        <h4 class="section-title">
+          <span class="icon">👤</span>
+          Client Details
+        </h4>
+        <div id="clientDetails" class="client-details"></div>
+      </div>
+
+      <!-- Job Details Section -->
+      <div class="section job-section">
+        <h4 class="section-title">
+          <span class="icon">💼</span>
+          Job Details
+        </h4>
+        <div id="jobDetails" class="job-details"></div>
+      </div>
+
+      <!-- LinkedIn Discovery Section -->
+      <div class="section linkedin-section">
+        <h4 class="section-title">
+          <span class="icon">🔗</span>
+          LinkedIn Discovery
+        </h4>
+        <div id="linkedinDetails" class="linkedin-details"></div>
+      </div>
+    </div>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
