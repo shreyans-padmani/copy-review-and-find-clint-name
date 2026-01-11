@@ -1,3 +1,8 @@
+// Load saved data when popup opens
+document.addEventListener('DOMContentLoaded', () => {
+  loadSavedData();
+});
+
 // Listen for API responses from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "API_RESPONSE") {
@@ -7,15 +12,43 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+// Save data to chrome.storage.local
+function saveDataToLocalStorage(data) {
+  try {
+    chrome.storage.local.set({ extractedData: data }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Error saving to storage:', chrome.runtime.lastError);
+      }
+    });
+  } catch (error) {
+    console.error('Error saving to storage:', error);
+  }
+}
+
+// Load saved data from chrome.storage.local
+function loadSavedData() {
+  try {
+    chrome.storage.local.get(['extractedData'], (result) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error loading from storage:', chrome.runtime.lastError);
+        return;
+      }
+      if (result.extractedData) {
+        displayResults(result.extractedData, false); // false = don't update status
+      }
+    });
+  } catch (error) {
+    console.error('Error loading from storage:', error);
+  }
+}
+
 document.getElementById("start").addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const statusEl = document.getElementById("status");
-  const resultsEl = document.getElementById("results");
 
-  // Reset UI
+  // Update status but keep previous data visible
   statusEl.innerText = "Processing page...";
   statusEl.className = "status-message processing";
-  resultsEl.style.display = "none";
 
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
@@ -23,13 +56,18 @@ document.getElementById("start").addEventListener("click", async () => {
   });
 });
 
-function displayResults(data) {
+function displayResults(data, updateStatus = true) {
   const statusEl = document.getElementById("status");
   const resultsEl = document.getElementById("results");
 
-  statusEl.innerText = "Extraction completed!";
-  statusEl.className = "status-message success";
+  if (updateStatus) {
+    statusEl.innerText = "Extraction completed!";
+    statusEl.className = "status-message success";
+  }
   resultsEl.style.display = "block";
+
+  // Save data to localStorage
+  saveDataToLocalStorage(data);
 
   // Display Client Details
   if (data.client) {
@@ -49,7 +87,7 @@ function displayResults(data) {
 
 function displayClientDetails(client) {
   const container = document.getElementById("clientDetails");
-  
+
   const clientName = client.name || client.inferred_name || "Unknown";
   const nameSource = client.name_source ? ` (${client.name_source})` : "";
   const confidence = client.name_confidence ? ` - ${client.name_confidence} confidence` : "";
@@ -116,7 +154,7 @@ function displayClientDetails(client) {
 
 function displayJobDetails(job) {
   const container = document.getElementById("jobDetails");
-  
+
   container.innerHTML = `
     <div class="detail-card">
       ${job.title ? `
@@ -178,7 +216,7 @@ function displayJobDetails(job) {
 
 function displayLinkedInDetails(linkedin) {
   const container = document.getElementById("linkedinDetails");
-  
+
   container.innerHTML = `
     <div class="detail-card">
       ${linkedin.confidence ? `
