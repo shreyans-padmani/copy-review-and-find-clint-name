@@ -69,8 +69,27 @@
     return finalText.join("\n");
   }
 
+  function getUpworkJobUrl() {
+    // Find the input field with aria-label="Job link"
+    const jobLinkInput = document.querySelector('input[aria-label="Job link"].air3-input');
+    if (jobLinkInput) {
+      const url = jobLinkInput.value || jobLinkInput.getAttribute('value') || '';
+      if (url) {
+        // Optionally click the copy button to copy to clipboard
+        const copyButton = jobLinkInput.closest('div')?.querySelector('button[aria-label="Copy to clipboard"]');
+        if (copyButton) {
+          copyButton.click();
+        }
+        return url;
+      }
+    }
+    // Fallback to current page URL if input not found
+    return window.location.href;
+  }
+
   await expandAllContent();
   const text = getCleanText();
+  const upworkJobUrl = getUpworkJobUrl();
 
   chrome.runtime.sendMessage({
     type: "SEND_TEXT",
@@ -78,7 +97,8 @@
       url: window.location.href,
       timestamp: new Date().toISOString(),
       charCount: text.length,
-      text
+      text,
+      upwork_job_url: upworkJobUrl
     }
   });
 

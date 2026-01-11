@@ -5,7 +5,8 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          raw_text: message.payload.text
+          raw_text: message.payload.text,
+          upwork_job_url: message.payload.upwork_job_url || message.payload.url
         })
       });
 
@@ -14,7 +15,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       }
 
       const data = await response.json();
-      
+
       // Send the response back to popup
       chrome.runtime.sendMessage({
         type: "API_RESPONSE",
