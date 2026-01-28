@@ -13,15 +13,31 @@
 
   async function expandAllContent() {
     let clickCount = 0;
+    let foundButtons = true;
 
-    while (clickCount < MAX_CLICKS) {
-      const buttons = [...document.querySelectorAll(VIEW_MORE_SELECTOR)]
+    while (clickCount < MAX_CLICKS && foundButtons) {
+      foundButtons = false;
+
+      // Find "view more" links
+      const viewMoreButtons = [...document.querySelectorAll(VIEW_MORE_SELECTOR)]
         .filter(btn => btn.innerText.toLowerCase().includes("view more"))
         .filter(isVisible);
 
-      if (buttons.length === 0) break;
+      // Find truncation "more" buttons
+      const truncationButtons = [...document.querySelectorAll('button.air3-truncation-btn')]
+        .filter(btn => {
+          const span = btn.querySelector('span');
+          return span && span.innerText.toLowerCase().trim() === 'more';
+        })
+        .filter(btn => btn.getAttribute('aria-expanded') === 'false')
+        .filter(isVisible);
 
-      for (const btn of buttons) {
+      const allButtons = [...viewMoreButtons, ...truncationButtons];
+
+      if (allButtons.length === 0) break;
+
+      foundButtons = true;
+      for (const btn of allButtons) {
         btn.click();
         clickCount++;
         await sleep(CLICK_DELAY);

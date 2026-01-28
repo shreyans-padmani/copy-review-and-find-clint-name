@@ -98,10 +98,10 @@ function displayClientDetails(client) {
         <span class="label">Name:</span>
         <span class="value highlight">${escapeHtml(clientName)}${escapeHtml(nameSource)}${escapeHtml(confidence)}</span>
       </div>
-      ${client.type ? `
+      ${client.company_name ? `
       <div class="detail-row">
         <span class="label">Type:</span>
-        <span class="value">${escapeHtml(client.type)}</span>
+        <span class="value">${escapeHtml(client.company_name)}</span>
       </div>
       ` : ''}
       ${client.location ? `
